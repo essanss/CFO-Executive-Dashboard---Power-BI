@@ -4,6 +4,9 @@
 
 ---
 
+## 🖼️ Dashboard Preview
+
+> *Screenshots coming soon — see `/screenshots` folder after building in Power BI*
 
 | Page | Description |
 |------|-------------|
@@ -111,6 +114,28 @@ CFO-Executive-Dashboard/
 
 ---
 
+## ⚙️ How to Use This Repository
+
+### Step 1 — Clone the Repository
+```bash
+git clone https://github.com/YOUR_USERNAME/CFO-Executive-Dashboard.git
+```
+
+### Step 2 — Open Power BI Desktop
+Download from: https://powerbi.microsoft.com/desktop
+
+### Step 3 — Follow the Setup Guide
+Read `docs/Setup_Guide.md` for the complete step-by-step build process.
+
+### Step 4 — Load the Data
+Import all 3 CSV files from `/data` into Power BI via **Get Data → Text/CSV**
+
+### Step 5 — Add DAX Measures
+Paste measures from `dax/DAX_Measures.dax` into a dedicated `_Measures` table.
+
+### Step 6 — Build Visuals
+Follow `docs/Dashboard_Design_Guide.md` for the exact visual layout per page.
+
 ---
 
 ## 🗂️ Data Dictionary
@@ -208,7 +233,7 @@ SWITCH(
 ## 🛠️ Tools & Technologies
 
 | Tool | Version | Purpose |
-|------|---------|---------|
+|------|---------|----------|
 | Power BI Desktop | Latest | Report development |
 | DAX | — | All measures & calculations |
 | Power Query (M) | — | Data transformation & DimDate |
@@ -216,3 +241,9 @@ SWITCH(
 
 ---
 
+## 📬 Connect
+
+If you found this useful, feel free to ⭐ the repository!
+
+> Built to demonstrate real-world Power BI skills for finance dashboards.
+> All data is synthetic and generated purely for demonstration purposes.
