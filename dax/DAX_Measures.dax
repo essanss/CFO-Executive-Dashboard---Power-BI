@@ -1,0 +1,374 @@
+# DAX Measures — CFO Executive Dashboard
+# All measures to be created in Power BI under a dedicated "📊 Measures" table
+
+# ============================================================
+# 1. BASE KPI MEASURES
+# ============================================================
+
+# --- Revenue ---
+Total Revenue =
+SUM(financials[Revenue])
+
+# --- EBITDA ---
+Total EBITDA =
+SUM(financials[EBITDA])
+
+EBITDA Margin % =
+DIVIDE([Total EBITDA], [Total Revenue], 0)
+
+# --- Net Profit ---
+Total Net Profit =
+SUM(financials[Net_Profit])
+
+Net Profit Margin % =
+DIVIDE([Total Net Profit], [Total Revenue], 0)
+
+# --- Cash Flow ---
+Operating Cash Flow =
+SUM(cashflow_workingcapital[Operating_Cash_Flow])
+
+Net Cash Flow =
+SUM(cashflow_workingcapital[Net_Cash_Flow])
+
+# --- Gross Profit ---
+Total Gross Profit =
+SUM(financials[Gross_Profit])
+
+Gross Profit Margin % =
+DIVIDE([Total Gross Profit], [Total Revenue], 0)
+
+# --- Working Capital ---
+Working Capital =
+SUM(cashflow_workingcapital[Working_Capital])
+
+Current Ratio =
+DIVIDE(
+    SUM(cashflow_workingcapital[Current_Assets]),
+    SUM(cashflow_workingcapital[Current_Liabilities]),
+    0
+)
+
+# ============================================================
+# 2. AP / AR TURNOVER
+# ============================================================
+
+Accounts Receivable =
+SUM(cashflow_workingcapital[Accounts_Receivable])
+
+Accounts Payable =
+SUM(cashflow_workingcapital[Accounts_Payable])
+
+AR Turnover =
+DIVIDE([Total Revenue], [Accounts Receivable], 0)
+
+AP Turnover =
+DIVIDE(SUM(financials[COGS]), [Accounts Payable], 0)
+
+DSO (Days Sales Outstanding) =
+DIVIDE(365, [AR Turnover], 0)
+
+DPO (Days Payable Outstanding) =
+DIVIDE(365, [AP Turnover], 0)
+
+Cash Conversion Cycle =
+[DSO (Days Sales Outstanding)]
+- [DPO (Days Payable Outstanding)]
++ AVERAGE(cashflow_workingcapital[Inventory_Days])
+
+# ============================================================
+# 3. YTD CALCULATIONS
+# ============================================================
+
+Revenue YTD =
+CALCULATE(
+    [Total Revenue],
+    DATESYTD(DimDate[Date])
+)
+
+EBITDA YTD =
+CALCULATE(
+    [Total EBITDA],
+    DATESYTD(DimDate[Date])
+)
+
+Net Profit YTD =
+CALCULATE(
+    [Total Net Profit],
+    DATESYTD(DimDate[Date])
+)
+
+Cash Flow YTD =
+CALCULATE(
+    [Operating Cash Flow],
+    DATESYTD(DimDate[Date])
+)
+
+Budget Revenue YTD =
+CALCULATE(
+    SUM(budget_vs_actual[Budget_Revenue]),
+    DATESYTD(DimDate[Date])
+)
+
+Budget EBITDA YTD =
+CALCULATE(
+    SUM(budget_vs_actual[Budget_EBITDA]),
+    DATESYTD(DimDate[Date])
+)
+
+# ============================================================
+# 4. MTD CALCULATIONS
+# ============================================================
+
+Revenue MTD =
+CALCULATE(
+    [Total Revenue],
+    DATESMTD(DimDate[Date])
+)
+
+EBITDA MTD =
+CALCULATE(
+    [Total EBITDA],
+    DATESMTD(DimDate[Date])
+)
+
+Net Profit MTD =
+CALCULATE(
+    [Total Net Profit],
+    DATESMTD(DimDate[Date])
+)
+
+# ============================================================
+# 5. PRIOR PERIOD COMPARISONS (PY / PM)
+# ============================================================
+
+Revenue PY =
+CALCULATE(
+    [Total Revenue],
+    SAMEPERIODLASTYEAR(DimDate[Date])
+)
+
+Revenue YoY Growth % =
+DIVIDE(
+    [Total Revenue] - [Revenue PY],
+    [Revenue PY],
+    0
+)
+
+Revenue Prior Month =
+CALCULATE(
+    [Total Revenue],
+    PREVIOUSMONTH(DimDate[Date])
+)
+
+Revenue MoM Growth % =
+DIVIDE(
+    [Total Revenue] - [Revenue Prior Month],
+    [Revenue Prior Month],
+    0
+)
+
+EBITDA PY =
+CALCULATE(
+    [Total EBITDA],
+    SAMEPERIODLASTYEAR(DimDate[Date])
+)
+
+EBITDA YoY Growth % =
+DIVIDE(
+    [Total EBITDA] - [EBITDA PY],
+    [EBITDA PY],
+    0
+)
+
+# ============================================================
+# 6. BUDGET vs ACTUAL VARIANCE
+# ============================================================
+
+Budget Revenue =
+SUM(budget_vs_actual[Budget_Revenue])
+
+Revenue Variance =
+[Total Revenue] - [Budget Revenue]
+
+Revenue Variance % =
+DIVIDE([Revenue Variance], [Budget Revenue], 0)
+
+Budget EBITDA =
+SUM(budget_vs_actual[Budget_EBITDA])
+
+EBITDA Variance =
+[Total EBITDA] - [Budget EBITDA]
+
+EBITDA Variance % =
+DIVIDE([EBITDA Variance], [Budget EBITDA], 0)
+
+Budget Net Profit =
+SUM(budget_vs_actual[Budget_Net_Profit])
+
+Net Profit Variance =
+[Total Net Profit] - [Budget Net Profit]
+
+Net Profit Variance % =
+DIVIDE([Net Profit Variance], [Budget Net Profit], 0)
+
+Budget OpEx =
+SUM(budget_vs_actual[Budget_OpEx])
+
+OpEx Variance =
+SUM(financials[Operating_Expenses]) - [Budget OpEx]
+
+OpEx Variance % =
+DIVIDE([OpEx Variance], [Budget OpEx], 0)
+
+# ============================================================
+# 7. ROLLING AVERAGES
+# ============================================================
+
+Revenue 3M Rolling Avg =
+CALCULATE(
+    [Total Revenue],
+    DATESINPERIOD(
+        DimDate[Date],
+        LASTDATE(DimDate[Date]),
+        -3,
+        MONTH
+    )
+) / 3
+
+Revenue 6M Rolling Avg =
+CALCULATE(
+    [Total Revenue],
+    DATESINPERIOD(
+        DimDate[Date],
+        LASTDATE(DimDate[Date]),
+        -6,
+        MONTH
+    )
+) / 6
+
+EBITDA 3M Rolling Avg =
+CALCULATE(
+    [Total EBITDA],
+    DATESINPERIOD(
+        DimDate[Date],
+        LASTDATE(DimDate[Date]),
+        -3,
+        MONTH
+    )
+) / 3
+
+Net Profit 3M Rolling Avg =
+CALCULATE(
+    [Total Net Profit],
+    DATESINPERIOD(
+        DimDate[Date],
+        LASTDATE(DimDate[Date]),
+        -3,
+        MONTH
+    )
+) / 3
+
+Cash Flow 3M Rolling Avg =
+CALCULATE(
+    [Operating Cash Flow],
+    DATESINPERIOD(
+        DimDate[Date],
+        LASTDATE(DimDate[Date]),
+        -3,
+        MONTH
+    )
+) / 3
+
+# ============================================================
+# 8. FINANCIAL RATIOS
+# ============================================================
+
+Return on Revenue (RoR) =
+DIVIDE([Total Net Profit], [Total Revenue], 0)
+
+Return on Assets (ROA) =
+DIVIDE(
+    [Total Net Profit],
+    SUM(cashflow_workingcapital[Current_Assets]),
+    0
+)
+
+Debt Service Coverage Ratio =
+DIVIDE(
+    [Total EBITDA],
+    SUM(financials[Interest_Expense]) + SUM(financials[Depreciation]),
+    0
+)
+
+Operating Leverage =
+DIVIDE(
+    [Total Gross Profit],
+    [Total EBITDA],
+    0
+)
+
+EBITDA to Revenue =
+DIVIDE([Total EBITDA], [Total Revenue], 0)
+
+Tax Rate Effective =
+DIVIDE(
+    SUM(financials[Tax]),
+    SUM(financials[EBIT]),
+    0
+)
+
+Interest Coverage Ratio =
+DIVIDE(
+    SUM(financials[EBIT]),
+    SUM(financials[Interest_Expense]),
+    0
+)
+
+# ============================================================
+# 9. KPI STATUS FLAGS (for Conditional Formatting)
+# ============================================================
+
+Revenue Status =
+SWITCH(
+    TRUE(),
+    [Revenue Variance %] >= 0.05,  "🟢 Exceeded",
+    [Revenue Variance %] >= 0,     "🟡 On Track",
+    [Revenue Variance %] >= -0.05, "🟠 At Risk",
+    "🔴 Behind"
+)
+
+EBITDA Status =
+SWITCH(
+    TRUE(),
+    [EBITDA Variance %] >= 0.05,  "🟢 Exceeded",
+    [EBITDA Variance %] >= 0,     "🟡 On Track",
+    [EBITDA Variance %] >= -0.05, "🟠 At Risk",
+    "🔴 Behind"
+)
+
+Cash Flow Status =
+SWITCH(
+    TRUE(),
+    [Net Cash Flow] > 1000000, "🟢 Strong",
+    [Net Cash Flow] > 500000,  "🟡 Healthy",
+    [Net Cash Flow] > 0,       "🟠 Tight",
+    "🔴 Negative"
+)
+
+# ============================================================
+# 10. DYNAMIC TITLES (for Visuals)
+# ============================================================
+
+Selected Period Title =
+"CFO Dashboard — " &
+SELECTEDVALUE(DimDate[Month], "All Months") & " " &
+SELECTEDVALUE(DimDate[Year], "All Years")
+
+YTD vs PY Label =
+"YTD Revenue: " &
+FORMAT([Revenue YTD], "$#,##0,,M") &
+" | PY: " &
+FORMAT(
+    CALCULATE([Revenue YTD], SAMEPERIODLASTYEAR(DimDate[Date])),
+    "$#,##0,,M"
+)
